@@ -80,16 +80,19 @@ async function selectCertType(page: Page, label: string) {
 // Helper: upload a file into the Mantine <FileInput> (hidden native input)
 // ---------------------------------------------------------------------------
 async function uploadCertFile(page: Page, filePath: string) {
-  // Mantine FileInput uses a visually hidden <input type="file">.
-  // We click the visible button to expose it, then set files via the hidden input.
-  const certFileInput = page.getByTestId('cert-file-input');
-  await certFileInput.click();
-  // After click, the file chooser or the hidden input becomes interactive.
-  // Use the first file input on the page (Mantine places it near the button).
   const fileInput = page.locator('input[type="file"]').first();
+
+  // Wait for element to exist and be usable
+  await expect(fileInput).toBeAttached({ timeout: 10000 });
+  await expect(fileInput).toBeVisible({ timeout: 10000 });
+
+  // Extra safety: check page not closed
+  if (page.isClosed()) {
+    throw new Error("Page was closed before file upload");
+  }
+
   await fileInput.setInputFiles(filePath);
 }
-
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------

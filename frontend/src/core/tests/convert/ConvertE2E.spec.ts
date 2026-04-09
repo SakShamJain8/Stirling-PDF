@@ -103,7 +103,11 @@ async function navigateToConvert(page: Page) {
 // ---------------------------------------------------------------------------
 async function selectToFormat(page: Page, toValue: string) {
   await page.getByTestId('convert-to-dropdown').click();
+  // Wait for dropdown menu to appear
+  await page.getByTestId(`format-option-${toValue}`).waitFor({ state: 'visible', timeout: 5000 });
   await page.getByTestId(`format-option-${toValue}`).click();
+  // Wait for button to become enabled after format selection
+  await page.getByTestId('convert-button').waitFor({ state: 'enabled', timeout: 5000 });
 }
 
 // ---------------------------------------------------------------------------
